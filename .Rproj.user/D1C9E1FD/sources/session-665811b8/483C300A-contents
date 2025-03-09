@@ -1,0 +1,91 @@
+---
+title: "Graph Templates"
+---
+
+## Graph Templates
+
+```{r}
+library(tidyverse)
+library(ggthemes)
+library(ggplot2)
+library(scales)
+library(patchwork)
+library(hrbrthemes)
+library(extrafonts)
+import_roboto_condensed()
+```
+
+### Loading Data
+
+```{r}
+gdp_data <- read.csv("gdp.csv", stringsAsFactors = FALSE, check.names = FALSE)
+gdp_long <- pivot_longer(gdp_data, cols = -Country, names_to = "Year", values_to = "Value")
+gdp_long$Year <- as.integer(gdp_long$Year)
+gdp_long <- gdp_long |> filter(Year >= 1980)
+```
+
+### Apricitas
+
+```{r}
+
+theme_apricitas <- theme_ft_rc(subtitle_family = "Roboto Condensed", caption_family = "Roboto Condensed") +
+  theme(axis.line = element_line(colour = "white"),legend.position = c(.95,.95),legend.text = element_text(size = 11, color = "white"))
+
+gdp_formatter_apricitas <- function(x) {
+  paste0("$ ",formatC(x / 1e12, format = "fg"), " trillion")
+}
+
+ggplot(gdp_long, aes(x = Year, y = Value, color = Country)) +
+  geom_line(size = 1) +
+  labs(title = "GDP by Country (Post 1980)",
+       subtitle = "For the largest 5 GDPs in the world",
+       x = "Year",
+       y = "GDP ($)",
+       color = "Country",
+       caption = "Graph created by @felpix_ with @JosephPolitano's themeing") +
+  theme_apricitas +
+  theme(legend.position = c(.2,.7)) +
+  scale_color_manual(name= NULL,values = c("#FFE98F","#00A99D","#EE6055","#A7ACD9","#9ffa96")) +
+  coord_cartesian(clip = "off") +
+  scale_y_continuous(labels = gdp_formatter_apricitas, breaks = scales::pretty_breaks(n = 10))
+```
+
+### Economist
+
+```{r}
+
+gdp_formatter_economist <- function(x) {
+         paste0("$ ",formatC(x / 1e12, format = "fg"), " trillion")
+}
+
+ggplot(gdp_long, aes(x = Year, y = Value, color = Country)) +
+  geom_line(size = 1) +
+  labs(title = "GDP by Country (Post 1980)",
+       subtitle = "For the largest 5 GDPs in the world",
+       x = NULL,
+       y = NULL,
+       color = "Country",
+       caption = "Graph created by @felpix_ with Economist themeing") +
+  scale_y_continuous(position = "right", labels = gdp_formatter_economist, breaks = scales::pretty_breaks(n = 10)) +
+  theme(aspect.ratio = 3.2/7,
+        text = element_text(family = "Roboto Condensed"),
+        plot.margin = margin(t = 0, r = 0.5, b = 0, l = 0.5, unit = "cm"),
+        plot.background = element_rect(fill = "white"),
+        panel.background = element_rect(fill = "white"),
+        panel.grid.major.x = element_blank(),
+        panel.grid.minor.x = element_blank(),
+        panel.grid.major.y = element_line(color = "#dcdbd8"),
+        panel.grid.minor.y = element_blank(),
+        legend.text = element_text(margin = margin(l=3), size = 10),
+        legend.title = element_blank(),
+        legend.position = c(0.088, 0.68),
+        legend.key.width = unit(25,"pt"),
+        legend.key.height = unit(15, "pt"),
+        legend.key = element_blank(),
+        axis.text = element_text(size = rel(1), color = "gray8"),
+        axis.line.x  = element_line(color = "gray8"),
+        axis.ticks.y = element_blank(),
+        plot.title = element_text(size = rel(1.5), hjust = 0, face = "bold"),
+        plot.caption = element_text(hjust = 0, size = 9, colour = "#4B4B4B")) +
+  scale_color_manual(name = NULL, values = c("#17648d", "#51bec7", "#008c8f", "#d6ab63", "#843844"))
+```

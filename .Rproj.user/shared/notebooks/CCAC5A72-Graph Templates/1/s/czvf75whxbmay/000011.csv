@@ -1,0 +1,4 @@
+"0","gdp_data <- read.csv(""gdp.csv"", stringsAsFactors = FALSE, check.names = FALSE)"
+"0","gdp_long <- pivot_longer(gdp_data, cols = -Country, names_to = ""Year"", values_to = ""Value"")"
+"0","gdp_long$Year <- as.integer(gdp_long$Year)"
+"0","gdp_long <- gdp_long |> filter(Year >= 1980)"
